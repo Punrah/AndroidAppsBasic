@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fitsSystemWindows="true">
+    <ImageView android:src="@drawable/main_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="24dp"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="56dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <TextView
+            android:textSize="18sp"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Please check the verification code we have sent to your phone and enter the code here"/>
+
+
+
+        <!-- Email Label -->
+        <!-- Email Label -->
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/code"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Enter your code here" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Password Label -->
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btnVerify"
+            android:background="@drawable/border_round_yellow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:textSize="18dp"
+            android:padding="12dp"
+            android:text="SUBMIT"
+            android:textColor="@color/white"/>
+
+
+    </LinearLayout>
+</RelativeLayout>
