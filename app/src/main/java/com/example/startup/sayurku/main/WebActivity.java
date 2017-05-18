@@ -58,38 +58,9 @@ public class WebActivity extends RootActivity {
 
 
     private class getWeb extends MyAsyncTask {
-        @Override
 
 
-        protected void onPreExecute() {
-            super.onPreExecute();
 
-        }
-        protected Void doInBackground(Void... arg0) {
-
-            HttpHandler sh = new HttpHandler();
-            String url = AppConfig.getWebURL(webAction);
-
-
-            try {
-                web = sh.makeServiceCall(url);
-                isSucces=true;
-            } catch (IOException e) {
-                badInternetAlert();
-            }
-
-            return null;
-        }
-
-        @Override
-        public void setPreloading() {
-
-        }
-
-        @Override
-        public void setPostLoading() {
-
-        }
 
         @Override
         public Context getContext() {
@@ -105,6 +76,20 @@ public class WebActivity extends RootActivity {
         @Override
         public void setFailPostExecute() {
 
+        }
+
+        @Override
+        public void postData() {
+            HttpHandler sh = new HttpHandler();
+            String url = AppConfig.getWebURL(webAction);
+
+
+            try {
+                web = sh.makeServiceCall(url);
+                isSucces=true;
+            } catch (IOException e) {
+                badInternetAlert();
+            }
         }
     }
 }

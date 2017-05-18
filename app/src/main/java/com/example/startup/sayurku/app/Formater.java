@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.startup.sayurku.persistence.Item;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +25,7 @@ public  class Formater extends AppCompatActivity {
 
     public static String getPrice(String price)
     {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "ZA"));
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         return formatter.format(Double.parseDouble(price));
 
     }
@@ -111,6 +113,24 @@ public  class Formater extends AppCompatActivity {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher((CharSequence) email);
         return matcher.matches();
+
+    }
+
+
+    public static class OrderByPrice implements Comparator<Item> {
+
+        public int compare(Item obj1, Item obj2) {
+            return ((Integer)obj1.price).compareTo(obj2.price);
+        }
+
+
+    }
+
+    public static class OrderByName implements Comparator<Item> {
+
+        public int compare(Item obj1, Item obj2) {
+            return obj1.name.compareTo(obj2.name);
+        }
 
     }
 

@@ -14,6 +14,7 @@ public class User implements Parcelable {
     public  String email;
     public  String phone;
     public  String id_customer;
+    public  String password;
     public String deviceId;
 
     public User()
@@ -22,6 +23,7 @@ public class User implements Parcelable {
         email ="";
         phone="";
         id_customer ="";
+        password="";
 
     }
 

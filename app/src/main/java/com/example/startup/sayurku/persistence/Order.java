@@ -1,146 +1,90 @@
 package com.example.startup.sayurku.persistence;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import com.example.startup.sayurku.helper.OrderSQLiteHandler;
+import com.example.startup.sayurku.helper.SessionManager;
+import com.example.startup.sayurku.main.MainActivity;
+import com.google.gson.Gson;
 
-
-
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
- * Created by Startup on 2/1/17.
+ * Created by Startup on 1/31/17.
  */
 
-public class Order  {
+public class Order  implements Parcelable{
 
     public User user;
     public String id_order;
     public String orderDate;
     public int price;
-    public int priceCar;
-    public int priceBike;
-    public double distance;
-    public LatLng pickupPosition;
-    public LatLng dropoofPosition;
-    public String pickupAddress;
-    public String dropoffAddress;
-    public Driver driver;
-    public String pickupNote;
-    public String dropoffNote;
-    public String status;
-    public int orderType;
-    public String vehicle;
-    public String payment_type;
-    public int rating;
+    public List<Item> item;
+    public int totalPrice;
 
-    public Order()
+    public Order(Context context)
     {
+
+
+        item = new ArrayList<Item>();
         user = new User();
         id_order="";
         orderDate="";
         price=0;
-        priceCar=0;
-        priceBike=0;
-        distance=0;
-        pickupPosition = new LatLng(0,0);
-        dropoofPosition=new LatLng(0,0);
-        pickupAddress="";
-        dropoffAddress="";
-        driver = new Driver();
-        pickupNote="";
-        dropoffNote="";
-        status="";
-        orderType=0;
-        vehicle="";
-        payment_type="";
-        rating=0;
-
+        totalPrice=0;
     }
 
 
-
-    public void setPrice(String priceString)
-    {
-        price=Integer.parseInt(priceString);
-    }
-    public String getPriceString() {
-        return String.valueOf(price);
-    }
-    public String getDistanceString() {
-        return String.valueOf(distance);
-    }
-    public String getPickupLatString() {
-        return String.valueOf(pickupPosition.latitude);
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public String getPickupLngString() {
-        return String.valueOf(pickupPosition.longitude);
-    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(user,flags);
+        dest.writeString(id_order);
+        dest.writeString(orderDate);
+        dest.writeInt(price);
+        dest.writeList(item);
+        dest.writeInt(totalPrice);
 
-    public String getDropoffLatString() {
-        return String.valueOf(dropoofPosition.latitude);
-    }
-
-    public String getDropoffLngString() {
-        return String.valueOf(dropoofPosition.longitude);
-    }
-
-    public String getPickupNoteString()
-    {
-
-            return pickupNote;
-
-    }
-    public String getDropoffNoteString()
-    {
-
-            return dropoffNote;
 
     }
 
+    public Order(Parcel parcel) {
 
-    public void setPickupPlace(Place place)
-    {
-        pickupPosition=place.getLatLng();
-        pickupAddress=place.getAddress().toString();
+        this.user = (User) parcel.readParcelable(User.class.getClassLoader());
+        this.id_order=parcel.readString();
+        this.orderDate=parcel.readString();
+        this.price=parcel.readInt();
+        this.item = parcel.readArrayList(Item.class.getClassLoader());
+        this.totalPrice=parcel.readInt();
+
     }
 
-    public void setDropoffPlace(Place place)
-    {
-        dropoofPosition=place.getLatLng();
-        dropoffAddress=place.getAddress().toString();
-    }
+    // Method to recreate a Question from a Parcel
+    public static Creator<Order> CREATOR = new Creator<Order>() {
 
-    public String getDateTime() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        Date date= null;
-        try {
-            date = simpleDateFormat.parse(orderDate);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
+        @Override
+        public Order createFromParcel(Parcel source) {
+            return  new Order(source);
         }
-        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("MMMM/dd/yy, HH:mm aa");
-        return simpleDateFormat2.format(date);
 
-    }
+        @Override
+        public Order[] newArray(int size) {
+            return new Order[size];
+        }
 
-    public String getPrice()
-    {
-        DecimalFormat df = new DecimalFormat("#.00"); // Set your desired format here.
-        return "R "+ df.format(price/100.0);
-    }
+    };
 
-    public String getOrderNo()
-    {
-        return "ORDER NO "+id_order;
-    }
+
 
 
 }

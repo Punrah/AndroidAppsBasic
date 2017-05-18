@@ -107,11 +107,7 @@ public class VerifyActivity extends AppCompatActivity {
                 return VerifyActivity.this;
             }
 
-            @Override
-            protected Void doInBackground (Void...params){
-                postData();
-                return super.doInBackground(params);
-            }
+
 
             @Override
             public void setSuccessPostExecute() {
@@ -180,6 +176,7 @@ public class VerifyActivity extends AppCompatActivity {
                 badInternetAlert();
             }
         }
+
 
     }
 

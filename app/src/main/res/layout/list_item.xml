@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    android:background="@drawable/border_shadow"
+    android:layout_marginBottom="1dp"
+    android:layout_margin="5dp">
+
+    <LinearLayout
+        android:padding="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:padding="10dp"
+            android:id="@+id/img_item"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/main_logo"
+            android:background="@color/white"/>
+
+        <RelativeLayout
+            android:paddingLeft="5dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+
+                <TextView
+                    android:id="@+id/item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16dp"
+                    android:textColor="@color/black"
+                    android:text="Item Name"
+                    android:layout_marginBottom="0dp"/>
+                <TextView
+                    android:layout_below="@id/item_name"
+                    android:id="@+id/item_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="description jsjsjsmsnmnsmnsmnsmdbjhvsjkcvjavcjkadvcjahdvcjhdvcjhsvcjkhdvcasdsnmsnmsnmsnmsnsmnsmnsmnsmsnmsn"
+                    android:layout_marginBottom="10dp"/>
+                        <TextView
+                            android:layout_alignParentBottom="true"
+                            android:layout_gravity="bottom"
+                            android:id="@+id/price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16dp"
+                            android:text="Rp.0.00"
+                            android:layout_marginBottom="5dp"/>
+
+        </RelativeLayout>
+
+
+
+
+        </LinearLayout>
+    </LinearLayout>
+

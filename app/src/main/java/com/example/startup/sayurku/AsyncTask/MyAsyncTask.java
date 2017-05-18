@@ -35,12 +35,13 @@ public abstract class MyAsyncTask extends AsyncTask<Void,Void,Void> {
 
     AlertDialog.Builder alert;
 
+
+
     @Override
     protected Void doInBackground(Void... params) {
+        postData();
         return null;
     }
-
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -67,6 +68,7 @@ public abstract class MyAsyncTask extends AsyncTask<Void,Void,Void> {
 
     public abstract void setSuccessPostExecute();
     public abstract void setFailPostExecute();
+    public abstract void postData();
 
     public  void setPreloading()
     {

@@ -211,11 +211,7 @@ public class RegisterActivity extends AppCompatActivity {
                 return RegisterActivity.this;
             }
 
-            @Override
-            protected Void doInBackground (Void...params){
-                postData();
-                return super.doInBackground(params);
-            }
+
 
             @Override
             public void setSuccessPostExecute() {
@@ -306,6 +302,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             }
         }
+
 
     }
 

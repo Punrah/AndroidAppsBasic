@@ -19,15 +19,18 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.startup.sayurku.AsyncTask.ImageAsyncTask;
 import com.example.startup.sayurku.AsyncTask.MyAsyncTask;
 import com.example.startup.sayurku.R;
 import com.example.startup.sayurku.app.AppConfig;
 import com.example.startup.sayurku.app.Formater;
+import com.example.startup.sayurku.helper.OrderSQLiteHandler;
 import com.example.startup.sayurku.persistence.Item;
+import com.example.startup.sayurku.persistence.Order;
+import com.example.startup.sayurku.persistence.StoredOrder;
 import com.example.startup.sayurku.persistence.User;
 import com.example.startup.sayurku.persistence.UserGlobal;
 
@@ -46,9 +49,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -59,14 +60,10 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout linearLayoutGridGanjil;
     private List<Item> listItem=new ArrayList<Item>();
 
-    List<TextView> textViewsQty;
-    List<LinearLayout> linearLayoutsCounter;
-    List<LinearLayout> linearLayoutsAdd;
-    List<LinearLayout> linearLayoutsCounterContainer;
 
     AlertDialog levelDialog;
 
-    final CharSequence[] order = {" Termurah "," Termahal "," A-Z "," Z-A "};
+    final CharSequence[] sort = {" Termurah "," Termahal "," A-Z "," Z-A "};
     final CharSequence[] view = {" Grid "," List "};
 
     int orderChecked=2;
@@ -78,7 +75,9 @@ public class MainActivity extends AppCompatActivity
     LinearLayout linearLayoutView;
 
     TextView textViewCategory;
-
+    RelativeLayout checkout;
+    TextView orderQty;
+    StoredOrder order;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +88,18 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         textViewCategory = (TextView) toolbar.findViewById(R.id.category);
+        checkout = (RelativeLayout) toolbar.findViewById(R.id.checkout);
+
+
+
+        order= new StoredOrder(MainActivity.this);
+        orderQty = (TextView) toolbar.findViewById(R.id.order_qty);
+        setCart();
+
+
+
+
+
 
 
 
@@ -126,7 +137,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setSingleChoiceItems(order, orderChecked, new DialogInterface.OnClickListener() {
+                builder.setSingleChoiceItems(sort, orderChecked, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
 
 
@@ -190,8 +201,30 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        checkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,CheckoutActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setCart();
+    }
+
+    private void setCart()
+    {
+
+        orderQty.setText(String.valueOf(order.getItem().size()));
+    }
+
+
 
     private void orderItem()
     {
@@ -241,6 +274,7 @@ public class MainActivity extends AppCompatActivity
         if (listItem.size() > 0) {
 
             for (int i = 0; i < listItem.size(); i++) {
+                final int j=i;
                 LayoutInflater inflater = getLayoutInflater();
                 final LinearLayout convertView = (LinearLayout) inflater.inflate(R.layout.list_item, linearLayoutList, false);
                 TextView name = (TextView) convertView.findViewById(R.id.item_name);
@@ -261,8 +295,7 @@ public class MainActivity extends AppCompatActivity
                         Animation animation1 = new AlphaAnimation(0.3f, 5.0f);
                         animation1.setDuration(800);
                         convertView.startAnimation(animation1);
-                        Intent intent = new Intent(MainActivity.this,ItemActivity.class);
-                        startActivity(intent);
+                        viewDetailItem(listItem.get(j));
                     }
                 });
 
@@ -271,7 +304,6 @@ public class MainActivity extends AppCompatActivity
 
             }
         }
-        setRecapPrice();
     }
 
     private void fetchGrid()
@@ -285,6 +317,7 @@ public class MainActivity extends AppCompatActivity
         if (listItem.size() > 0) {
 
             for (int i = 0; i < listItem.size(); i++) {
+                final int j=i;
                 if(i%2==0) {
 
                     LayoutInflater inflater = getLayoutInflater();
@@ -304,8 +337,7 @@ public class MainActivity extends AppCompatActivity
                             Animation animation1 = new AlphaAnimation(0.3f, 5.0f);
                             animation1.setDuration(800);
                             convertView.startAnimation(animation1);
-                            Intent intent = new Intent(MainActivity.this,ItemActivity.class);
-                            startActivity(intent);
+                            viewDetailItem(listItem.get(j));
                         }
                     });
 
@@ -323,6 +355,7 @@ public class MainActivity extends AppCompatActivity
                     price.setText(listItem.get(i).getPrice());
                     imageView.setTag(listItem.get(i).photo);
                     new ImageAsyncTask().execute(imageView);
+
                     convertView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -330,8 +363,8 @@ public class MainActivity extends AppCompatActivity
                             Animation animation1 = new AlphaAnimation(0.3f, 5.0f);
                             animation1.setDuration(800);
                             convertView.startAnimation(animation1);
-                            Intent intent = new Intent(MainActivity.this,ItemActivity.class);
-                            startActivity(intent);
+                            viewDetailItem(listItem.get(j));
+
                         }
                     });
 
@@ -341,7 +374,14 @@ public class MainActivity extends AppCompatActivity
 
             }
         }
-        setRecapPrice();
+    }
+
+
+    private void viewDetailItem(Item item)
+    {
+        Intent intent = new Intent(MainActivity.this,ItemActivity.class);
+        intent.putExtra("item",item);
+        startActivity(intent);
     }
 
     private class fetchCategory extends MyAsyncTask{
@@ -423,138 +463,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private class fetchItemCheckout extends MyAsyncTask{
-
-
-
-
-        @Override
-        public Context getContext() {
-            return MainActivity.this;
-        }
-
-        @Override
-        public void setSuccessPostExecute() {
-            textViewsQty = new ArrayList<TextView>();
-            linearLayoutsCounter = new ArrayList<LinearLayout>();
-            linearLayoutsAdd = new ArrayList<LinearLayout>();
-            linearLayoutsCounterContainer = new ArrayList<LinearLayout>();
-            linearLayoutList.removeAllViews();
-
-            if (listItem.size() > 0) {
-
-                for (int i = 0; i < listItem.size(); i++) {
-                    LayoutInflater inflater = getLayoutInflater();
-                    LinearLayout convertView = (LinearLayout) inflater.inflate(R.layout.list_item, linearLayoutList, false);
-                    TextView name = (TextView) convertView.findViewById(R.id.item_name);
-                    TextView price = (TextView) convertView.findViewById(R.id.price);
-                    TextView description = (TextView) convertView.findViewById(R.id.item_description);
-                    ImageView imageView = (ImageView) convertView.findViewById(R.id.img_item);
-                    final ImageView minus = (ImageView) convertView.findViewById(R.id.minus);
-                    final ImageView plus = (ImageView) convertView.findViewById(R.id.plus);
-                    textViewsQty.add((TextView) convertView.findViewById(R.id.qty));
-                    linearLayoutsCounterContainer.add((LinearLayout) convertView.findViewById(R.id.counter_container));
-                    linearLayoutsCounter.add((LinearLayout)convertView.findViewById(R.id.counter));
-
-                    LinearLayout linearLayoutAdd = (LinearLayout)convertView.findViewById(R.id.add);
-                    final int j = i;
-                    linearLayoutAdd.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            plusQty(j);
-                        }
-                    });
-                    linearLayoutsAdd.add(linearLayoutAdd);
-                    setCounterState(i);
-                    name.setText(String.valueOf(listItem.get(i).name));
-                    price.setText(listItem.get(i).getPrice());
-                    description.setText(String.valueOf(listItem.get(i).description));
-                    imageView.setTag(listItem.get(i).photo);
-                    new ImageAsyncTask().execute(imageView);
-                    textViewsQty.get(i).setText(String.valueOf(listItem.get(i).qty));
-
-                    minus.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View view) {
-                            minusQty(j);
-                        }
-
-                    });
-
-                    plus.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View view) {
-                            plusQty(j);
-                        }
-                    });
-                    linearLayoutList.addView(convertView);
-
-                }
-            }
-            setRecapPrice();
-
-
-        }
-
-        @Override
-        public void setFailPostExecute() {
-
-        }
-
-        public void postData() {
-            String url = AppConfig.URL_ITEM;
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(url);
-            try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-                nameValuePairs.add(new BasicNameValuePair("email", UserGlobal.getUser(MainActivity.this).email));
-                nameValuePairs.add(new BasicNameValuePair("password", UserGlobal.getUser(MainActivity.this).password));
-                nameValuePairs.add(new BasicNameValuePair("device_id", User.getDeviceId(MainActivity.this)));
-                //nameValuePairs.add(new BasicNameValuePair("device_id", User.getDeviceId(MainActivity.this)));
-
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                String jsonStr = EntityUtils.toString(entity, "UTF-8");
-
-                if (jsonStr != null) {
-                    try {
-
-                        JSONArray jsonArray = new JSONArray(jsonStr);
-                        if(jsonArray.length()>0)
-                        {
-                            isSucces=true;
-                            for(int i=0;i<jsonArray.length();i++)
-                            {
-                                JSONObject jsonItem = jsonArray.getJSONObject(i);
-                                Item item = new Item();
-                                item.name = jsonItem.getString("nama");
-                                item.description = jsonItem.getString("deskripsi");
-                                item.price = jsonItem.getInt("harga");
-                                item.metric = jsonItem.getString("satuan");
-                                listItem.add(item);
-                            }
-                        }
-                        else
-                        {
-                            badServerAlert();
-                        }
-
-                    } catch (final JSONException e) {
-                        badServerAlert();
-                    }
-                } else {
-                    badServerAlert();
-                }
-            } catch (IOException e) {
-                badInternetAlert();
-            }
-        }
-
-
-    }
 
     private class fetchItem extends MyAsyncTask{
 
@@ -638,46 +546,7 @@ fetch();
 
 
 
-    public void minusQty(int i) {
 
-        listItem.get(i).minOne();
-        textViewsQty.get(i).setText(String.valueOf(listItem.get(i).getQty()));
-        setCounterState(i);
-        setRecapPrice();
-    }
-
-    public void plusQty(int i) {
-        listItem.get(i).plusOne();
-        textViewsQty.get(i).setText(String.valueOf(listItem.get(i).getQty()));
-        setCounterState(i);
-        setRecapPrice();
-    }
-
-    public void setCounterState(int i)
-    {
-
-        if(listItem.get(i).qty<1)
-        {
-
-            linearLayoutsCounterContainer.get(i).removeView(linearLayoutsCounter.get(i));
-            linearLayoutsCounterContainer.get(i).removeView(linearLayoutsAdd.get(i));
-            linearLayoutsCounterContainer.get(i).addView(linearLayoutsAdd.get(i));
-
-        }
-        else
-        {
-            linearLayoutsCounterContainer.get(i).removeView(linearLayoutsAdd.get(i));
-            linearLayoutsCounterContainer.get(i).removeView(linearLayoutsCounter.get(i));
-            linearLayoutsCounterContainer.get(i).addView(linearLayoutsCounter.get(i));
-
-        }
-
-    }
-
-    private void setRecapPrice()
-    {
-
-    }
 
 
 

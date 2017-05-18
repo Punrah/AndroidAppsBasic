@@ -3,6 +3,9 @@ package com.example.startup.sayurku.persistence;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 /**
  * Created by Startup on 2/10/17.
  */
@@ -11,7 +14,7 @@ public class Item implements Parcelable {
 
     public String idItem;
     public String name;
-    public String restaurantName;
+    public String metric;
     public String description;
     public int price;
     public String photo;
@@ -19,14 +22,26 @@ public class Item implements Parcelable {
     public String notes;
     public Item()
     {
+
         idItem="";
         name="";
-        restaurantName="";
+        metric ="";
         photo="";
         price=0;
         description="";
         qty=0;
         notes="";
+    }
+
+    public String getPrice()
+    {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return formatter.format(price)+"/"+metric;
+    }
+
+    public String getQty()
+    {
+        return String.valueOf(qty)+" "+metric;
     }
 
 
@@ -36,9 +51,14 @@ public class Item implements Parcelable {
     }
     public void minOne()
     {
-        if(qty>0) {
+        if(qty>1) {
             qty--;
         }
+    }
+
+    public String getItemPriceString() {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return formatter.format(qty*price);
     }
 
     public int getItemPrice() {
@@ -55,7 +75,7 @@ public class Item implements Parcelable {
             Item item = new Item();
             item.idItem = source.readString();
             item.name = source.readString();
-            item.restaurantName = source.readString();
+            item.metric = source.readString();
             item.description=source.readString();
             item.photo=source.readString();
             item.price=source.readInt();
@@ -77,7 +97,7 @@ public class Item implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(idItem);
         parcel.writeString(name);
-        parcel.writeString(restaurantName);
+        parcel.writeString(metric);
         parcel.writeString(description);
         parcel.writeString(photo);
         parcel.writeInt(price);

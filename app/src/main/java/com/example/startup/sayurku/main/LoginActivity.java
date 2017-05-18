@@ -137,11 +137,7 @@ public class LoginActivity extends AppCompatActivity {
             return LoginActivity.this;
         }
 
-        @Override
-        protected Void doInBackground (Void...params){
-            postData();
-            return super.doInBackground(params);
-        }
+
 
         @Override
         public void setSuccessPostExecute() {
@@ -226,6 +222,7 @@ public class LoginActivity extends AppCompatActivity {
                 badInternetAlert();
             }
         }
+
 
     }
 
