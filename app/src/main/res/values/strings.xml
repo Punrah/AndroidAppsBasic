@@ -1,4 +1,5 @@
 <resources>
+    <string name="coba">hehe</string>
     <string-array name="CountryCodes">
         <item>93,AF</item>
         <item>355,AL</item>
