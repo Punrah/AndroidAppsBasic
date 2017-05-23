@@ -1,6 +1,7 @@
 package com.example.startup.sayurku.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,6 +26,7 @@ import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
 import com.example.startup.sayurku.persistence.User;
 import com.example.startup.sayurku.persistence.UserGlobal;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -106,7 +108,12 @@ public class CheckoutActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(CheckoutActivity.this,
+                    LoginActivity.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 

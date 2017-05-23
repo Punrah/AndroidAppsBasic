@@ -19,6 +19,7 @@ import com.example.startup.sayurku.R;
 import com.example.startup.sayurku.persistence.Item;
 import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ItemActivity extends AppCompatActivity {
 
@@ -128,7 +129,12 @@ public class ItemActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(ItemActivity.this,
+                    LoginActivity.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.startup.sayurku.AsyncTask.ImageAsyncTask;
 import com.example.startup.sayurku.AsyncTask.MyAsyncTask;
@@ -33,6 +35,13 @@ import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
 import com.example.startup.sayurku.persistence.User;
 import com.example.startup.sayurku.persistence.UserGlobal;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -78,6 +87,8 @@ public class MainActivity extends AppCompatActivity
     RelativeLayout checkout;
     TextView orderQty;
     StoredOrder order;
+
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,10 +139,43 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
-        TextView name = (TextView)header.findViewById(R.id.name);
-        TextView email = (TextView)header.findViewById(R.id.email);
-        name.setText(UserGlobal.getUser(MainActivity.this).name);
-        email.setText(UserGlobal.getUser(MainActivity.this).email);
+        final TextView name = (TextView)header.findViewById(R.id.name);
+        final TextView email = (TextView)header.findViewById(R.id.email);
+
+// Initialize Database
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            mDatabase = FirebaseDatabase.getInstance().getReference()
+                    .child("users").child(user.getUid());
+            ValueEventListener postListener = new ValueEventListener() {
+
+
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get Post object and use the values to update the UI
+                    User user = dataSnapshot.getValue(User.class);
+                    // [START_EXCLUDE]
+                    name.setText(user.name);
+                    email.setText(user.email);
+                    // [END_EXCLUDE]
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    //Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                    // [START_EXCLUDE]
+                    Toast.makeText(MainActivity.this, "Failed to load post.",
+                            Toast.LENGTH_SHORT).show();
+                    // [END_EXCLUDE]
+                }
+            };
+            mDatabase.addListenerForSingleValueEvent(postListener);
+
+
+        }
+
 
         linearLayoutOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -575,7 +619,12 @@ fetch();
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(MainActivity.this,
+                    LoginActivity.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 

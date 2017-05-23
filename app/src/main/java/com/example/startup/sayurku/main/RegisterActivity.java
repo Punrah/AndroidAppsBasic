@@ -8,14 +8,17 @@ package com.example.startup.sayurku.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.startup.sayurku.AsyncTask.MyAsyncTask;
 import com.example.startup.sayurku.R;
@@ -23,7 +26,15 @@ import com.example.startup.sayurku.app.AppConfig;
 import com.example.startup.sayurku.app.Formater;
 import com.example.startup.sayurku.helper.SessionManager;
 import com.example.startup.sayurku.helper.UserSQLiteHandler;
+import com.example.startup.sayurku.persistence.User;
 import com.example.startup.sayurku.persistence.UserGlobal;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,6 +69,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     private TextView countryCode;
 
+    private FirebaseAuth mAuth;
+
+    private DatabaseReference mDatabase;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,26 +91,8 @@ public class RegisterActivity extends AppCompatActivity {
         privacyPolicy = (TextView) findViewById(R.id.privacy_policy);
 
 
-
-
-
-
-
-
-        // Session manager
-        session = new SessionManager(getApplicationContext());
-
-        // SQLite database handler
-        db = new UserSQLiteHandler(getApplicationContext());
-
-        // Check if user is already logged in or not
-        if (session.isLoggedIn()) {
-            // User is already logged in. Take him to main activity
-            Intent intent = new Intent(RegisterActivity.this,
-                    MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // Register Button Click event
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -105,43 +102,8 @@ public class RegisterActivity extends AppCompatActivity {
                 String phone = inputPhone.getText().toString().trim();
                 String formatedPhone = Formater.phoneNumber(inputPhone.getText().toString().trim(),GetCountryZipCode());
                 String password = inputPassword.getText().toString().trim();
+                createAccount(email,password);
 
-                if(name.isEmpty())
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_name_pop_up));
-                }
-                else if(email.isEmpty())
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_email_pop_up));
-                }
-                else if(!Formater.isValidEmailAddress(email))
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.email_format_pop_up));
-                }
-                else if(phone.isEmpty())
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_phone_pop_up));
-                }
-                else if(phone.length()<8)
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.phone_format_pop_up));
-                }
-                else if(password.isEmpty())
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_password_pop_up));
-                }
-                else if(password.length()<8)
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.minimum_characters_error_messages));
-                }
-                else if(!password.matches("[A-Za-z0-9]+"))
-                {
-                    Formater.viewDialog(RegisterActivity.this,getString(R.string.must_be_alphanumerics_error_messages));
-                }
-                else
-                {
-                new registerUser(name, email,formatedPhone, password).execute();
-                }
             }
         });
 
@@ -184,6 +146,106 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
+
+    private void createAccount(String email, String password) {
+        Log.d(TAG, "createAccount:" + email);
+        if (!validateForm()) {
+            return;
+        }
+
+        //showProgressDialog();
+
+        // [START create_user_with_email]
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            User user = new User();
+                            user.id_customer=firebaseUser.getUid();
+                            user.email=firebaseUser.getEmail();
+                            user.name=inputFullName.getText().toString().trim();
+                            user.phone=inputPhone.getText().toString().trim();
+                            mDatabase.child("users").child(user.id_customer).setValue(user);
+                            Intent intent = new Intent(RegisterActivity.this,
+                                    MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // [START_EXCLUDE]
+                        //hideProgressDialog();
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END create_user_with_email]
+    }
+
+    private boolean validateForm() {
+        boolean valid = false;
+
+
+
+
+        String name = inputFullName.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
+        String phone = inputPhone.getText().toString().trim();
+        String formatedPhone = Formater.phoneNumber(inputPhone.getText().toString().trim(),GetCountryZipCode());
+        String password = inputPassword.getText().toString().trim();
+
+        if(name.isEmpty())
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_name_pop_up));
+        }
+        else if(email.isEmpty())
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_email_pop_up));
+        }
+        else if(!Formater.isValidEmailAddress(email))
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.email_format_pop_up));
+        }
+        else if(phone.isEmpty())
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_phone_pop_up));
+        }
+        else if(phone.length()<8)
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.phone_format_pop_up));
+        }
+        else if(password.isEmpty())
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.empty_password_pop_up));
+        }
+        else if(password.length()<8)
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.minimum_characters_error_messages));
+        }
+        else if(!password.matches("[A-Za-z0-9]+"))
+        {
+            Formater.viewDialog(RegisterActivity.this,getString(R.string.must_be_alphanumerics_error_messages));
+        }
+        else
+        {
+            valid=true;
+        }
+
+        return valid;
     }
 
 
