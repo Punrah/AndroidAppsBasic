@@ -16,11 +16,16 @@ import android.widget.Toast;
 
 import com.example.startup.sayurku.AsyncTask.ImageAsyncTask;
 import com.example.startup.sayurku.R;
+import com.example.startup.sayurku.helper.SessionManager;
+import com.example.startup.sayurku.helper.UserSQLiteHandler;
 import com.example.startup.sayurku.persistence.Item;
 import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
 
 public class ItemActivity extends AppCompatActivity {
+
+    private UserSQLiteHandler db;
+    private SessionManager session;
 
     ImageView back;
     RelativeLayout checkout;
@@ -40,6 +45,11 @@ public class ItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        db = new UserSQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(ItemActivity.this);
+
         checkout = (RelativeLayout) toolbar.findViewById(R.id.checkout);
 
         order = new StoredOrder(ItemActivity.this);
@@ -128,11 +138,22 @@ public class ItemActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.logout) {
+            logoutUser();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutUser() {
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(ItemActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

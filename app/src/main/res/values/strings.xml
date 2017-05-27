@@ -212,7 +212,7 @@
     <string name="email_taken_error_message">Email ini sudah terdaftar</string>
     <string name="phone_number_taken_error_message">No. HP ini sudah terdaftar</string>
     <string name="minimum_characters_error_messages">Kata sandi minimal 8 karakter</string>
-    <string name="must_be_alphanumerics_error_messages">Harus memuat huruf dan angka</string>
+    <string name="must_be_alphanumerics_error_messages">Harus memuat huruf atau angka</string>
     <string name="empty_name_pop_up">Mohon masukkan nama Anda</string>
     <string name="empty_email_pop_up">Mohon masukkan email Anda</string>
     <string name="empty_phone_pop_up">Mohon masukkan No. HP  Anda</string>
@@ -259,4 +259,5 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_item">ItemActivity</string>
     <string name="title_activity_checkout">CheckoutActivity</string>
+    <string name="empty_address_pop_up">Mohon masukan alamat pengiriman anda</string>
 </resources>

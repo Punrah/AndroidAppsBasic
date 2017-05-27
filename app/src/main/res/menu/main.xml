@@ -2,8 +2,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/akun_saya"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Akun Saya"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/pesanan_saya"
+        android:orderInCategory="100"
+        android:title="Pesanan Saya"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/alamat_saya"
+        android:orderInCategory="100"
+        android:title="Alamat Saya"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/kebijakan"
+        android:orderInCategory="100"
+        android:title="Kebijakan"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/bantuan"
+        android:orderInCategory="100"
+        android:title="Kebijakan"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/logout"
+        android:orderInCategory="100"
+        android:title="Logout"
         app:showAsAction="never" />
 </menu>

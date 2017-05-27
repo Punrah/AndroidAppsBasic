@@ -28,6 +28,8 @@ import com.example.startup.sayurku.R;
 import com.example.startup.sayurku.app.AppConfig;
 import com.example.startup.sayurku.app.Formater;
 import com.example.startup.sayurku.helper.OrderSQLiteHandler;
+import com.example.startup.sayurku.helper.SessionManager;
+import com.example.startup.sayurku.helper.UserSQLiteHandler;
 import com.example.startup.sayurku.persistence.Item;
 import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout linearLayoutGridGanjil;
     private List<Item> listItem=new ArrayList<Item>();
 
+    private UserSQLiteHandler db;
+    private SessionManager session;
 
     AlertDialog levelDialog;
 
@@ -90,6 +94,9 @@ public class MainActivity extends AppCompatActivity
         textViewCategory = (TextView) toolbar.findViewById(R.id.category);
         checkout = (RelativeLayout) toolbar.findViewById(R.id.checkout);
 
+        db = new UserSQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(MainActivity.this);
 
 
         order= new StoredOrder(MainActivity.this);
@@ -127,11 +134,6 @@ public class MainActivity extends AppCompatActivity
 
 
         navigationView.setNavigationItemSelectedListener(this);
-        View header=navigationView.getHeaderView(0);
-        TextView name = (TextView)header.findViewById(R.id.name);
-        TextView email = (TextView)header.findViewById(R.id.email);
-        name.setText(UserGlobal.getUser(MainActivity.this).name);
-        email.setText(UserGlobal.getUser(MainActivity.this).email);
 
         linearLayoutOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -575,11 +577,22 @@ fetch();
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.logout) {
+            logoutUser();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutUser() {
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 

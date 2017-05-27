@@ -1,6 +1,7 @@
 package com.example.startup.sayurku.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,8 @@ import com.example.startup.sayurku.AsyncTask.ImageAsyncTask;
 import com.example.startup.sayurku.AsyncTask.MyAsyncTask;
 import com.example.startup.sayurku.R;
 import com.example.startup.sayurku.app.AppConfig;
+import com.example.startup.sayurku.helper.SessionManager;
+import com.example.startup.sayurku.helper.UserSQLiteHandler;
 import com.example.startup.sayurku.persistence.Item;
 import com.example.startup.sayurku.persistence.Order;
 import com.example.startup.sayurku.persistence.StoredOrder;
@@ -55,6 +58,9 @@ public class CheckoutActivity extends AppCompatActivity {
     List<Item> items;
     TextView sumPrice;
     TextView checkout;
+
+    private UserSQLiteHandler db;
+    private SessionManager session;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +68,11 @@ public class CheckoutActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Checkout");
+
+        db = new UserSQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(CheckoutActivity.this);
+
 
         back = (ImageView) findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -106,11 +117,22 @@ public class CheckoutActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.logout) {
+            logoutUser();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutUser() {
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(CheckoutActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void fetchItemCheckout()

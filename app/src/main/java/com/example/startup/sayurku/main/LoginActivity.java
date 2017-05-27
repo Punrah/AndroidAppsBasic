@@ -87,11 +87,11 @@ public class LoginActivity extends AppCompatActivity {
                 // Check for empty data in the form
                 if(email.isEmpty())
                 {
-                    Formater.viewDialog(LoginActivity.this,getString(R.string.empty_email_pop_up));
+                    inputEmail.setError(getString(R.string.empty_email_pop_up));
                 }
                 else if(password.isEmpty())
                 {
-                    Formater.viewDialog(LoginActivity.this,getString(R.string.empty_password_pop_up));
+                    inputPassword.setError(getString(R.string.empty_password_pop_up));
                 }
                 else
                 {
