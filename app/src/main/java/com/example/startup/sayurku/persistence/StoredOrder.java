@@ -68,6 +68,21 @@ public class StoredOrder{
 
     }
 
+    public String getItemJson()
+    {
+        Gson gson = new Gson();
+        String json = pref.getString(PREF_NAME, "");
+        if(json.equals(""))
+        {
+            return gson.toJson(new ArrayList<Item>());
+        }
+        else
+        {
+            Order order=gson.fromJson(json,Order.class);
+            return gson.toJson(order.item);
+        }
+    }
+
     public boolean addItem(Item item)
     {
         item.qty=1;
@@ -83,6 +98,7 @@ public class StoredOrder{
         }
         else
         {
+
             if(containsId(order.item,item.name))
             {
                 val=false;
@@ -143,6 +159,7 @@ public class StoredOrder{
         int price=0;
         for(int i=0;i<order.item.size();i++)
         {
+
             price=price+order.item.get(i).getItemPrice();
         }
         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
